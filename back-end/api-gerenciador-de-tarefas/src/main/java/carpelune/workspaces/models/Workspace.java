@@ -26,7 +26,6 @@ public class Workspace implements Serializable {
 	@Column()
 	private String description;
 	
-	@GeneratedValue
 	@Column(name = "creation_timestamp")
 	private Long creationTimestamp;
 	
