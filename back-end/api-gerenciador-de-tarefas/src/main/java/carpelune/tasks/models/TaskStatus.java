@@ -2,8 +2,7 @@ package carpelune.tasks.models;
 
 public enum TaskStatus {
 	
-	OPEN_UNASSIGNED,
-	OPEN_ASSIGNED,
+	TODO,
 	IN_PROGRESS,
-	COMPLETED
+	DONE
 }
