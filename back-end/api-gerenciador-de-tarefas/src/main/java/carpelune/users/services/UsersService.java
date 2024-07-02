@@ -42,12 +42,18 @@ public class UsersService {
 			String encryptedPassword = TextEncryptor.encode(createUserDTO.password());
 			newUser.setPassword(encryptedPassword);
 			
+			this.logger.log(Level.WARNING, "saving user record in the database");
+			this.usersRepository.save(newUser);
+			
+			return ResponseEntity.status(HttpStatus.OK).build();
 			
 		}
 		catch(Exception error) {
-			
-		}
-		
+			this.logger.log(Level.SEVERE, "error while registering user " + error.getMessage());
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
+		}	
 	}
+	
+	
 	
 }
