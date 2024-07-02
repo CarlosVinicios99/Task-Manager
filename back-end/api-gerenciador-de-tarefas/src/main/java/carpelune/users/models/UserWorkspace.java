@@ -17,10 +17,10 @@ public class UserWorkspace {
 	@GeneratedValue
 	private UUID id;
 	
-	@Column()
+	@Column(name = "user_id")
 	private UUID userId;
 	
-	@Column()
+	@Column(name = "workspace_id")
 	private UUID workspaceId;
 	
 	@Column()
