@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import carpelune.users.dto.CreateUserDTO;
-import carpelune.users.dto.FindUserByIdDTO;
+import carpelune.users.dto.FindUserDTO;
 import carpelune.users.models.User;
 import carpelune.users.repositories.UsersRepository;
 import carpelune.utils.TextEncryptor;
@@ -24,7 +24,7 @@ public class UsersService {
 	private UsersRepository usersRepository;
 	
 	
-	public ResponseEntity<User> createUser(CreateUserDTO createUserDTO){
+	public ResponseEntity<FindUserDTO> createUser(CreateUserDTO createUserDTO){
 		
 		this.logger.log(Level.INFO, "creating a new user");
 		
@@ -45,9 +45,10 @@ public class UsersService {
 			newUser.setPassword(encryptedPassword);
 			
 			this.logger.log(Level.WARNING, "saving user record in the database");
-			this.usersRepository.save(newUser);
+			User createdUser = this.usersRepository.save(newUser);
 			
-			return ResponseEntity.status(HttpStatus.CREATED).build();
+			return ResponseEntity.status(HttpStatus.CREATED)
+				.body(new FindUserDTO(createdUser.getId(), createdUser.getName(), createdUser.getEmail()));
 			
 		}
 		catch(Exception error) {
@@ -57,7 +58,7 @@ public class UsersService {
 		
 	}
 	
-	public ResponseEntity<FindUserByIdDTO> findUserById(UUID userId){
+	public ResponseEntity<FindUserDTO> findUserById(UUID userId){
 		
 		this.logger.log(Level.INFO, "fetching user by ID: " + userId);
 		
@@ -76,7 +77,7 @@ public class UsersService {
 			}
 			
 			return ResponseEntity.status(HttpStatus.OK)
-				.body(new FindUserByIdDTO(searchedUser.getId(), searchedUser.getName(), searchedUser.getEmail()));
+				.body(new FindUserDTO(searchedUser.getId(), searchedUser.getName(), searchedUser.getEmail()));
 			
 		}
 		catch(Exception error) {
@@ -85,4 +86,25 @@ public class UsersService {
 		}
 	}
 	
+	//TODO - UpdateUser
+	public ResponseEntity<Void> deleteUserById(UUID userId) { 
+		
+		this.logger.log(Level.INFO, "Deleting user with ID: " + userId);
+		
+		if(userId == null || userId.toString().isEmpty()) {
+			this.logger.log(Level.WARNING, "the provided ID is undefined");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		
+		try {
+			this.logger.log(Level.WARNING, "deleting user from the database");
+			this.usersRepository.deleteById(userId);
+			
+			return ResponseEntity.status(HttpStatus.OK).build();
+		}
+		catch(Exception error) {
+			this.logger.log(Level.SEVERE, "error while deleting user by ID " + error.getMessage());
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+		}
+	}
 }
