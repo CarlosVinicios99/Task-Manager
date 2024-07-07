@@ -1,5 +1,6 @@
 package carpelune.users.services;
 
+import java.lang.reflect.Field;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import carpelune.users.dto.CreateUserDTO;
 import carpelune.users.dto.FindUserDTO;
+import carpelune.users.dto.UpdateUserDTO;
 import carpelune.users.models.User;
 import carpelune.users.repositories.UsersRepository;
 import carpelune.utils.TextEncryptor;
@@ -86,7 +88,49 @@ public class UsersService {
 		}
 	}
 	
-	//TODO - UpdateUser
+	public ResponseEntity<Void> updateUser(UpdateUserDTO updateUserDTO){
+		
+		this.logger.log(Level.INFO, "updating user");
+		
+		try {
+			this.logger.log(Level.WARNING, "fetching user from the database");
+			User updatedUser = this.usersRepository.findById(updateUserDTO.id()).get();
+			
+			if(updatedUser == null) {
+				this.logger.log(Level.WARNING, "the provided ID does not correspond to any existing user");
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+			}
+			
+			Field[] fields = UpdateUserDTO.class.getDeclaredFields();
+			
+			for(Field field : fields) {
+	            field.setAccessible(true);
+	            Object value = field.get(updateUserDTO);
+
+	            if (value != null) {
+	                try {
+	                    Field userField = User.class.getDeclaredField(field.getName());
+	                    userField.setAccessible(true);
+	                    userField.set(updatedUser, value);
+	                } 
+	                catch(NoSuchFieldException e) {
+	                    logger.log(Level.WARNING, "Field " + field.getName() + "field not found in user");
+	                }
+	            }
+	        }
+			
+			this.logger.log(Level.WARNING, "updating user in the database");
+			this.usersRepository.save(updatedUser);
+			
+			return ResponseEntity.status(HttpStatus.OK).build();
+			
+		}
+		catch(Exception error) {
+			this.logger.log(Level.SEVERE, "error while updating user " + error.getMessage());
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+		}
+	}
+	
 	public ResponseEntity<Void> deleteUserById(UUID userId) { 
 		
 		this.logger.log(Level.INFO, "Deleting user with ID: " + userId);
