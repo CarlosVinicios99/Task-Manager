@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import carpelune.users.models.UserWorkspace;
+import carpelune.users.repositories.UsersWorkspacesRepository;
 import carpelune.workspaces.dto.CreateWorkspaceDTO;
 import carpelune.workspaces.models.Workspace;
 import carpelune.workspaces.repositories.WorkspacesRepository;
@@ -22,8 +24,11 @@ public class WorkspacesService {
 	@Autowired
 	private WorkspacesRepository workspacesRepository;
 	
+	@Autowired
+	private UsersWorkspacesRepository usersWorkspacesRepository;
 	
-	public ResponseEntity<Void> createWorkspace(CreateWorkspaceDTO workspaceDTO){
+	
+	public ResponseEntity<Workspace> createWorkspace(CreateWorkspaceDTO workspaceDTO){
 		
 		this.logger.log(Level.INFO, "creating a new workspace");
 		
@@ -34,9 +39,17 @@ public class WorkspacesService {
 			newWorkspace.setCreationTimestamp(Instant.now().toEpochMilli());
 			
 			this.logger.log(Level.WARNING, "saving workspace in the database");
-			this.workspacesRepository.save(newWorkspace);
+			newWorkspace = this.workspacesRepository.save(newWorkspace);
 			
-			return ResponseEntity.status(HttpStatus.OK).build();
+			UserWorkspace userWorkspace = new UserWorkspace();
+			userWorkspace.setUserId(workspaceDTO.userId());
+			userWorkspace.setRole("ADMIN");
+			userWorkspace.setWorkspaceId(newWorkspace.getId());
+			
+			this.logger.log(Level.WARNING, "saving the link between user and workspace in the database");
+			this.usersWorkspacesRepository.save(userWorkspace);
+			
+			return ResponseEntity.status(HttpStatus.OK).body(newWorkspace);
 			
 		}
 		catch(Exception error) {

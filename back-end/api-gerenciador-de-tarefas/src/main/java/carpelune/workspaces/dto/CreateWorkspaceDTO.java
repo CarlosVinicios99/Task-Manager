@@ -1,5 +1,7 @@
 package carpelune.workspaces.dto;
 
-public record CreateWorkspaceDTO(String title, String description) {
+import java.util.UUID;
+
+public record CreateWorkspaceDTO(UUID userId, String title, String description) {
 
 }
