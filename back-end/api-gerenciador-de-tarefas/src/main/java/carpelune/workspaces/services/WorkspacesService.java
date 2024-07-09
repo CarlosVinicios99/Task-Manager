@@ -101,6 +101,15 @@ public class WorkspacesService {
 		}
 		
 		try {
+			this.logger.log(Level.WARNING, "checking in the database if the user is an administrator of the workspace");
+			Boolean isUserAdminOfWorkspace = 
+				this.usersWorkspacesRepository.isUserAdminOfWorkspace(deleteWorkspaceDTO.userId(), deleteWorkspaceDTO.workspaceId());
+			
+			if(!isUserAdminOfWorkspace) {
+				this.logger.log(Level.WARNING, "user does not have permission to delete this workspace");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			}
+			
 			this.logger.log(Level.WARNING, "deleting the link between user and workspace in the database");
 			this.usersWorkspacesRepository
 				.deleteByUserIdAndWorkspaceId(deleteWorkspaceDTO.userId(), deleteWorkspaceDTO.workspaceId());
@@ -115,5 +124,4 @@ public class WorkspacesService {
 			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
 		}
 	}
-	
 }
