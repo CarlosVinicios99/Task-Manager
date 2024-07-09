@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import carpelune.users.models.UserWorkspace;
 import carpelune.users.repositories.UsersWorkspacesRepository;
 import carpelune.workspaces.dto.CreateWorkspaceDTO;
+import carpelune.workspaces.dto.DeleteWorkspaceDTO;
 import carpelune.workspaces.models.Workspace;
 import carpelune.workspaces.repositories.WorkspacesRepository;
 
@@ -83,8 +84,36 @@ public class WorkspacesService {
 			this.logger.log(Level.SEVERE, "error while fetching workspace by ID");
 			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
 		}
+	}
+	
+	public ResponseEntity<Void> deleteWorkspace(DeleteWorkspaceDTO deleteWorkspaceDTO){
 		
+		this.logger.log(Level.INFO, "deleting workspace");
 		
+		if(deleteWorkspaceDTO.userId() == null || deleteWorkspaceDTO.toString().isEmpty()) {
+			this.logger.log(Level.INFO, "the provided user ID is undefined");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		
+		if(deleteWorkspaceDTO.workspaceId() == null || deleteWorkspaceDTO.toString().isEmpty()) {
+			this.logger.log(Level.INFO, "the provided workspace ID is undefined");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		
+		try {
+			this.logger.log(Level.WARNING, "deleting the link between user and workspace in the database");
+			this.usersWorkspacesRepository
+				.deleteByUserIdAndWorkspaceId(deleteWorkspaceDTO.userId(), deleteWorkspaceDTO.workspaceId());
+			
+			this.logger.log(Level.WARNING, "deleting workspace by ID");
+			this.workspacesRepository.deleteById(deleteWorkspaceDTO.workspaceId());
+			
+			return ResponseEntity.status(HttpStatus.OK).build();
+		}
+		catch(Exception error) {
+			this.logger.log(Level.SEVERE, "error while deleting workspace by ID");
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+		}
 	}
 	
 }
