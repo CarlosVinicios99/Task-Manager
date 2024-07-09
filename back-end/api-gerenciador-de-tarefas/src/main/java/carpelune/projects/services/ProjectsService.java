@@ -1,6 +1,7 @@
 package carpelune.projects.services;
 
 import java.time.Instant;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +41,7 @@ public class ProjectsService {
 			this.logger.log(Level.WARNING, "saving the new project in the database");
 			newProject = this.projectsRepository.save(newProject);
 			
-			return ResponseEntity.status(HttpStatus.OK).body(newProject);
+			return ResponseEntity.status(HttpStatus.CREATED).body(newProject);
 		}
 		catch(Exception error) {
 			this.logger.log(Level.SEVERE, "error while registering project");
@@ -48,7 +49,32 @@ public class ProjectsService {
 		}
 	}
 	
-	//TODO public ResponseEntity<FindProjectDTO> findProjectById()
+	public ResponseEntity<Project> findProjectById(UUID projectId){
+		
+		this.logger.log(Level.INFO, "fetching project by ID");
+		
+		if(projectId == null || projectId.toString().isEmpty()) {
+			this.logger.log(Level.WARNING, "the provided project ID is undefined");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		
+		try {
+			this.logger.log(Level.WARNING, "fetching project from the database");
+			Project searchedProject = this.projectsRepository.findById(projectId).get();
+			
+			if(searchedProject == null) {
+				this.logger.log(Level.WARNING, "the provided ID does not correspond to any existing project");
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+			}
+			
+			return ResponseEntity.status(HttpStatus.OK).body(searchedProject);
+		}
+		catch(Exception error) {
+			this.logger.log(Level.SEVERE, "error while fetching project by ID");
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+		}
+	}
+	
 	//TODO public ResponseEntity<UpdateProjectDTO> updateProject()
 	//TODO public ResponseEntity<Void> deleteProject()
 	
