@@ -11,8 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import carpelune.projects.dto.CreateProjectDTO;
+import carpelune.projects.dto.DeleteProjectDTO;
 import carpelune.projects.models.Project;
 import carpelune.projects.repositories.ProjectsRepository;
+import carpelune.users.repositories.UsersWorkspacesRepository;
 
 @Service
 public class ProjectsService {
@@ -21,6 +23,9 @@ public class ProjectsService {
 	
 	@Autowired
 	private ProjectsRepository projectsRepository;
+	
+	@Autowired
+	private UsersWorkspacesRepository usersWorkspacesRepository;
 	
 	
 	public ResponseEntity<Project> createProject(CreateProjectDTO createProjectDTO){
@@ -76,6 +81,48 @@ public class ProjectsService {
 	}
 	
 	//TODO public ResponseEntity<UpdateProjectDTO> updateProject()
-	//TODO public ResponseEntity<Void> deleteProject()
+	
+	public ResponseEntity<Void> deleteProject(DeleteProjectDTO deleteProjectDTO){
+		
+		this.logger.log(Level.INFO, "deleting project by ID");
+		
+		if(deleteProjectDTO.userId() == null || deleteProjectDTO.userId().toString().isEmpty()) {
+			this.logger.log(Level.WARNING, "the provided user ID is undefined");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		
+		if(deleteProjectDTO.projectId() == null || deleteProjectDTO.projectId().toString().isEmpty()) {
+			this.logger.log(Level.WARNING, "the provided project ID is undefined");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		
+		try {
+			this.logger.log(Level.WARNING, "fetching the project from database");
+			Project project = this.projectsRepository.findById(deleteProjectDTO.projectId()).get();
+			
+			if(project == null) {
+				this.logger.log(Level.WARNING, "the provided ID does not correspond to any existing project");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			}
+			
+			this.logger.log(Level.WARNING, "checking in the database if the user is an administrator of the workspace");
+			Boolean isUserAdminOfWorkspace = 
+				this.usersWorkspacesRepository.isUserAdminOfWorkspace(deleteProjectDTO.userId(), project.getWorkspaceId());
+			
+			if(!isUserAdminOfWorkspace) {
+				this.logger.log(Level.WARNING, "user does not have permission to delete this project");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			}
+			
+			this.logger.log(Level.WARNING, "deleting project by ID");
+			this.projectsRepository.deleteById(project.getId());
+			
+			return ResponseEntity.status(HttpStatus.OK).build();
+		}
+		catch(Exception error) {
+			this.logger.log(Level.SEVERE, "error while deleting project");
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+		}
+	}
 	
 }
