@@ -2,6 +2,7 @@ package carpelune.workspaces.services;
 
 import java.util.logging.Logger;
 import java.time.Instant;
+import java.util.UUID;
 import java.util.logging.Level;
 
 
@@ -58,11 +59,32 @@ public class WorkspacesService {
 		}
 	}
 	
-	/*
-	public ResponseEntity<FindWorkspaceDTO> findWorkspaceById(){
+	public ResponseEntity<Workspace> findWorkspaceById(UUID workspaceId){
 		
-		this.logger.log(Level.INFO, "");
+		this.logger.log(Level.INFO, "fetching workspace by ID");
+		
+		if(workspaceId == null || workspaceId.toString().isEmpty()) {
+			this.logger.log(Level.WARNING, "the provided ID is undefined");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		
+		try {
+			this.logger.log(Level.WARNING, "fetching workspace from the database");
+			Workspace searchedWorkspace = this.workspacesRepository.findById(workspaceId).get();
+			
+			if(searchedWorkspace == null) {
+				this.logger.log(Level.WARNING, "the provided ID does not correspond to any existing workspace");
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+			}
+			
+			return ResponseEntity.status(HttpStatus.OK).body(searchedWorkspace);
+		}
+		catch(Exception error) {
+			this.logger.log(Level.SEVERE, "error while fetching workspace by ID");
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+		}
+		
+		
 	}
-	*/
 	
 }
