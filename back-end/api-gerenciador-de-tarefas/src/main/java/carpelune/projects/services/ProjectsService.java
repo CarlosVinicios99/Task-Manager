@@ -1,5 +1,6 @@
 package carpelune.projects.services;
 
+import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -12,9 +13,11 @@ import org.springframework.stereotype.Service;
 
 import carpelune.projects.dto.CreateProjectDTO;
 import carpelune.projects.dto.DeleteProjectDTO;
+import carpelune.projects.dto.UpdateProjectDTO;
 import carpelune.projects.models.Project;
 import carpelune.projects.repositories.ProjectsRepository;
 import carpelune.users.repositories.UsersWorkspacesRepository;
+import carpelune.workspaces.models.Workspace;
 
 @Service
 public class ProjectsService {
@@ -80,7 +83,61 @@ public class ProjectsService {
 		}
 	}
 	
-	//TODO public ResponseEntity<UpdateProjectDTO> updateProject()
+	public ResponseEntity<Void> updateProject(UpdateProjectDTO updateProjectDTO){
+		
+		this.logger.log(Level.INFO, "updating project");
+		
+		if(updateProjectDTO.id() == null || updateProjectDTO.id().toString().isEmpty()) {
+			this.logger.log(Level.WARNING, "the provided project ID is undefined");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		
+		if(updateProjectDTO.userId() == null || updateProjectDTO.userId().toString().isEmpty()) {
+			this.logger.log(Level.WARNING, "the provided user ID is undefined");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		
+		try {
+			this.logger.log(Level.WARNING, "checking in the database if the user is an administrator of the workspace");
+			Boolean isUserAdminOfWorkspace = 
+				this.usersWorkspacesRepository.isUserAdminOfWorkspace(updateProjectDTO.userId(), updateProjectDTO.id());
+				
+			if(!isUserAdminOfWorkspace) {
+				this.logger.log(Level.WARNING, "user does not have permission to delete this workspace");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			}
+			
+			this.logger.log(Level.WARNING, "fetching project from the database");
+			Project updatedProject = this.projectsRepository.findById(updateProjectDTO.id()).get();
+			
+			Field[] fields = UpdateProjectDTO.class.getDeclaredFields();
+			
+			for(Field field : fields) {
+	            field.setAccessible(true);
+	            Object value = field.get(updateProjectDTO);
+
+	            if (value != null) {
+	                try {
+	                    Field projectField = Workspace.class.getDeclaredField(field.getName());
+	                    projectField.setAccessible(true);
+	                    projectField.set(updatedProject, value);
+	                } 
+	                catch(NoSuchFieldException e) {
+	                    logger.log(Level.WARNING, "Field " + field.getName() + "field not found in project");
+	                }
+	            }
+	        }
+			
+			this.logger.log(Level.WARNING, "updating project in the database");
+			this.projectsRepository.save(updatedProject);
+			
+			return ResponseEntity.status(HttpStatus.OK).build();
+		}
+		catch(Exception error) {
+			this.logger.log(Level.SEVERE, "error while updating project " + error.getMessage());
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+		}
+	}
 	
 	public ResponseEntity<Void> deleteProject(DeleteProjectDTO deleteProjectDTO){
 		
@@ -124,5 +181,4 @@ public class ProjectsService {
 			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
 		}
 	}
-	
 }
