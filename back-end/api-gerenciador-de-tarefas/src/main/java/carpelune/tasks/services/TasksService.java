@@ -53,7 +53,30 @@ public class TasksService {
 	
 	public ResponseEntity<Task> findTaskById(UUID taskId){
 		
+		this.logger.log(Level.INFO, "fetching task by ID");
+		
+		if(taskId == null || taskId.toString().isEmpty()) {
+			this.logger.log(Level.WARNING, "the provided task ID is undefined");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		
+		try {
+			this.logger.log(Level.WARNING, "fetching task from the database");
+			Task searchedTask = this.tasksRepository.findById(taskId.toString()).get();
+			
+			if(searchedTask == null) {
+				this.logger.log(Level.WARNING, "the provided ID does not correspond to any existing task");
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+			}
+			
+			return ResponseEntity.status(HttpStatus.CREATED).body(searchedTask);
+		}
+		catch(Exception error) {
+			this.logger.log(Level.SEVERE, "error while fetching task by ID " + error.getMessage());
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+		}
 	}
 
+	
 	
 }
