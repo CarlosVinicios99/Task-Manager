@@ -1,5 +1,7 @@
 package carpelune.tasks.dto;
 
-public record DeleteTaskDTO() {
+import java.util.UUID;
+
+public record DeleteTaskDTO(UUID id, UUID creatorId) {
 
 }

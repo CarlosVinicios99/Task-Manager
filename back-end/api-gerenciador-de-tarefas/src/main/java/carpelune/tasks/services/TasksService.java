@@ -11,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import carpelune.projects.dto.UpdateProjectDTO;
-import carpelune.projects.models.Project;
 import carpelune.tasks.dto.CreateTaskDTO;
 import carpelune.tasks.dto.DeleteTaskDTO;
 import carpelune.tasks.dto.UpdateTaskDTO;
@@ -68,7 +66,7 @@ public class TasksService {
 		
 		try {
 			this.logger.log(Level.WARNING, "fetching task from the database");
-			Task searchedTask = this.tasksRepository.findById(taskId.toString()).get();
+			Task searchedTask = this.tasksRepository.findById(taskId).get();
 			
 			if(searchedTask == null) {
 				this.logger.log(Level.WARNING, "the provided ID does not correspond to any existing task");
@@ -144,10 +142,40 @@ public class TasksService {
 		}
 	}
 	
-	/* TODO
 	public ResponseEntity<Void> deleteTask(DeleteTaskDTO deleteTaskDTO){
 		
+		this.logger.log(Level.INFO, "deleting a task");
+		
+		if(deleteTaskDTO.id() == null || deleteTaskDTO.id().toString().isEmpty()) {
+			this.logger.log(Level.WARNING, "the provided task ID is undefined");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		
+		if(deleteTaskDTO.creatorId() == null || deleteTaskDTO.creatorId().toString().isEmpty()) {
+			this.logger.log(Level.WARNING, "the provided creator ID is undefined");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		
+		try {
+			this.logger.log(Level.WARNING, "fetching task from the database");
+			Task deletedTask = this.tasksRepository.findById(deleteTaskDTO.id()).get();
+			
+			if(deletedTask == null) {
+				this.logger.log(Level.WARNING, "the provided ID does not correspond to any existing task");
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+			}
+			
+			if(deletedTask.getCreatorId() != deleteTaskDTO.creatorId()) {
+				this.logger.log(Level.WARNING, "the provided creator ID is not associated with the task");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			}
+			
+			this.tasksRepository.deleteById(deleteTaskDTO.id());
+			return ResponseEntity.status(HttpStatus.OK).build();
+		}
+		catch(Exception error) {
+			this.logger.log(Level.SEVERE, "error while deleting task");
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+		}
 	}
-	*/
-	
 }
