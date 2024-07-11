@@ -1,5 +1,6 @@
 package carpelune.tasks.services;
 
+import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -10,9 +11,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import carpelune.projects.dto.UpdateProjectDTO;
+import carpelune.projects.models.Project;
 import carpelune.tasks.dto.CreateTaskDTO;
+import carpelune.tasks.dto.DeleteTaskDTO;
+import carpelune.tasks.dto.UpdateTaskDTO;
 import carpelune.tasks.models.Task;
 import carpelune.tasks.repositories.TasksRepository;
+import carpelune.workspaces.models.Workspace;
 
 @Service
 public class TasksService {
@@ -76,7 +82,72 @@ public class TasksService {
 			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
 		}
 	}
-
 	
+	
+	public ResponseEntity<Void> updateTask(UpdateTaskDTO updateTaskDTO){
+		
+		this.logger.log(Level.INFO, "updating task by ID");
+		
+		if(updateTaskDTO.id() == null || updateTaskDTO.id().toString().isEmpty()) {
+			this.logger.log(Level.WARNING, "the provided task ID is undefined");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		
+		if(
+			updateTaskDTO.creatorId() == null || updateTaskDTO.creatorId().toString().isEmpty()
+			&& updateTaskDTO.workerId() == null || updateTaskDTO.workerId().toString().isEmpty()
+		) {
+			this.logger.log(Level.WARNING, "no user ID involved in the task provided");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		
+		
+		try {
+			
+			this.logger.log(Level.WARNING, "fetching task from the database");
+			Task updatedTask = this.tasksRepository.findById(updateTaskDTO.id()).get();
+			
+			if(
+				updatedTask.getWorkerId() != updateTaskDTO.workerId() &&
+				updatedTask.getCreatorId() != updateTaskDTO.creatorId() 
+			){
+				this.logger.log(Level.WARNING, "none of the provided user IDs are associated with the task");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			}
+			
+			Field[] fields = UpdateTaskDTO.class.getDeclaredFields();
+			
+			for(Field field : fields) {
+	            field.setAccessible(true);
+	            Object value = field.get(updateTaskDTO);
+
+	            if (value != null) {
+	                try {
+	                    Field TaskField = Workspace.class.getDeclaredField(field.getName());
+	                    TaskField.setAccessible(true);
+	                    TaskField.set(updatedTask, value);
+	                } 
+	                catch(NoSuchFieldException e) {
+	                    logger.log(Level.WARNING, "Field " + field.getName() + "field not found in task");
+	                }
+	            }
+	        }
+			
+			this.logger.log(Level.WARNING, "updating task in the database");
+			this.tasksRepository.save(updatedTask);
+			
+			return ResponseEntity.status(HttpStatus.OK).build();
+		}
+		catch(Exception error) {
+			this.logger.log(Level.SEVERE, "error while updating task " + error.getMessage());
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+		}
+	}
+	
+	/* TODO
+	public ResponseEntity<Void> deleteTask(DeleteTaskDTO deleteTaskDTO){
+		
+	}
+	*/
 	
 }
