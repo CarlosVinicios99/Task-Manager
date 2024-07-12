@@ -64,11 +64,6 @@ public class UsersService {
 		
 		this.logger.log(Level.INFO, "fetching user by ID: " + userId);
 		
-		if(userId == null || userId.toString().isEmpty()) {
-			this.logger.log(Level.WARNING, "The provided ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
-		
 		try {
 			this.logger.log(Level.WARNING, "fetching user from the database");
 			User searchedUser = this.usersRepository.findById(userId).get();
@@ -134,11 +129,6 @@ public class UsersService {
 	public ResponseEntity<Void> deleteUserById(UUID userId) { 
 		
 		this.logger.log(Level.INFO, "Deleting user with ID: " + userId);
-		
-		if(userId == null || userId.toString().isEmpty()) {
-			this.logger.log(Level.WARNING, "the provided ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
 		
 		try {
 			this.logger.log(Level.WARNING, "deleting user from the database");
