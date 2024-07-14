@@ -1,0 +1,7 @@
+ALTER TABLE users
+DROP COLUMN email,
+DROP COLUMN password;
+
+ALTER TABLE users
+ADD COLUMN login_id UUID NOT NULL,
+ADD FOREIGN KEY (login_id) REFERENCES logins(id);
