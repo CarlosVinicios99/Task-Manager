@@ -9,5 +9,7 @@ import carpelune.authentication.models.Login;
 
 @Repository
 public interface LoginRepository extends JpaRepository<Login, UUID> {
-
+	
+	public Login findByEmail(String email);
+	
 }
