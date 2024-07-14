@@ -78,7 +78,7 @@ public class Login implements Serializable {
 			return false;
 		Login other = (Login) obj;
 		return Objects.equals(email, other.email) && Objects.equals(id, other.id)
-				&& Objects.equals(password, other.password);
+			&& Objects.equals(password, other.password);
 	}
 	
 }

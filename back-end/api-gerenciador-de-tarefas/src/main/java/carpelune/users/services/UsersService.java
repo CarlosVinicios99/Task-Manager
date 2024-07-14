@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import carpelune.authentication.models.Login;
+import carpelune.authentication.repositories.LoginRepository;
 import carpelune.users.dto.CreateUserDTO;
 import carpelune.users.dto.FindUserDTO;
 import carpelune.users.dto.UpdateUserDTO;
@@ -25,6 +27,9 @@ public class UsersService {
 	@Autowired
 	private UsersRepository usersRepository;
 	
+	@Autowired
+	private LoginRepository loginRepository;
+	
 	
 	public ResponseEntity<FindUserDTO> createUser(CreateUserDTO createUserDTO){
 		
@@ -38,13 +43,19 @@ public class UsersService {
 		}
 		
 		try {
-			User newUser = new User();
-			newUser.setName(createUserDTO.name());
-			//newUser.setEmail(createUserDTO.email());
+			Login newLogin = new Login();
+			newLogin.setEmail(createUserDTO.email());
 			
 			this.logger.log(Level.INFO, "encrypting the password");
 			String encryptedPassword = TextEncryptor.encode(createUserDTO.password());
-			//newUser.setPassword(encryptedPassword);
+			newLogin.setPassword(encryptedPassword);
+			
+			this.logger.log(Level.WARNING, "saving login record in the database");
+			newLogin = this.loginRepository.save(newLogin);
+			
+			User newUser = new User();
+			newUser.setName(createUserDTO.name());
+			newUser.setLogin(newLogin);
 			
 			this.logger.log(Level.WARNING, "saving user record in the database");
 			User createdUser = this.usersRepository.save(newUser);
