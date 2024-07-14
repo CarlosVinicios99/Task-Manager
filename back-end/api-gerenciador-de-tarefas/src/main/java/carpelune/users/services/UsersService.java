@@ -40,17 +40,17 @@ public class UsersService {
 		try {
 			User newUser = new User();
 			newUser.setName(createUserDTO.name());
-			newUser.setEmail(createUserDTO.email());
+			//newUser.setEmail(createUserDTO.email());
 			
 			this.logger.log(Level.INFO, "encrypting the password");
 			String encryptedPassword = TextEncryptor.encode(createUserDTO.password());
-			newUser.setPassword(encryptedPassword);
+			//newUser.setPassword(encryptedPassword);
 			
 			this.logger.log(Level.WARNING, "saving user record in the database");
 			User createdUser = this.usersRepository.save(newUser);
 			
 			return ResponseEntity.status(HttpStatus.CREATED)
-				.body(new FindUserDTO(createdUser.getId(), createdUser.getName(), createdUser.getEmail()));
+				.body(new FindUserDTO(createdUser.getId(), createdUser.getName(), createdUser.getLogin().getEmail()));
 			
 		}
 		catch(Exception error) {
@@ -74,7 +74,7 @@ public class UsersService {
 			}
 			
 			return ResponseEntity.status(HttpStatus.OK)
-				.body(new FindUserDTO(searchedUser.getId(), searchedUser.getName(), searchedUser.getEmail()));
+				.body(new FindUserDTO(searchedUser.getId(), searchedUser.getName(), searchedUser.getLogin().getEmail()));
 			
 		}
 		catch(Exception error) {

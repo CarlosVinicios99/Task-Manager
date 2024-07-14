@@ -4,10 +4,13 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
+import carpelune.authentication.models.Login;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -23,22 +26,19 @@ public class User implements Serializable {
 	@Column()
 	private String name;
 	
-	@Column()
-	private String email;
-	
-	@Column()
-	private String password;
+	@OneToOne
+	@JoinColumn(name = "login_id", nullable = false, unique = true)
+	private Login login;
 	
 	
 	public User() {
 		
 	}
 	
-	public User(UUID id, String name, String email, String password) {
+	public User(UUID id, String name, Login login) {
 		this.id = id;
 		this.name = name;
-		this.email = email;
-		this.password = password;
+		this.login = login;
 	}
 	
 
@@ -58,26 +58,18 @@ public class User implements Serializable {
 		this.name = name;
 	}
 
-	public String getEmail() {
-		return email;
+	public Login getLogin() {
+		return login;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setLogin(Login login) {
+		this.login = login;
 	}
 
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
 	
-
 	@Override
 	public int hashCode() {
-		return Objects.hash(email, id, name, password);
+		return Objects.hash(id, login, name);
 	}
 
 	@Override
@@ -89,8 +81,7 @@ public class User implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		User other = (User) obj;
-		return Objects.equals(email, other.email) && Objects.equals(id, other.id) && Objects.equals(name, other.name)
-				&& Objects.equals(password, other.password);
+		return Objects.equals(id, other.id) && Objects.equals(login, other.login) && Objects.equals(name, other.name);
 	}
 		
 }
