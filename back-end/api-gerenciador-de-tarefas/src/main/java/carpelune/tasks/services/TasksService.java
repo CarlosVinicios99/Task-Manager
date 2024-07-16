@@ -59,11 +59,6 @@ public class TasksService {
 		
 		this.logger.log(Level.INFO, "fetching task by ID");
 		
-		if(taskId == null || taskId.toString().isEmpty()) {
-			this.logger.log(Level.WARNING, "the provided task ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
-		
 		try {
 			this.logger.log(Level.WARNING, "fetching task from the database");
 			Task searchedTask = this.tasksRepository.findById(taskId).get();
@@ -81,15 +76,9 @@ public class TasksService {
 		}
 	}
 	
-	
 	public ResponseEntity<Void> updateTask(UpdateTaskDTO updateTaskDTO){
 		
 		this.logger.log(Level.INFO, "updating task by ID");
-		
-		if(updateTaskDTO.id() == null || updateTaskDTO.id().toString().isEmpty()) {
-			this.logger.log(Level.WARNING, "the provided task ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
 		
 		if(
 			updateTaskDTO.creatorId() == null || updateTaskDTO.creatorId().toString().isEmpty()
@@ -98,7 +87,6 @@ public class TasksService {
 			this.logger.log(Level.WARNING, "no user ID involved in the task provided");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}
-		
 		
 		try {
 			
@@ -145,16 +133,6 @@ public class TasksService {
 	public ResponseEntity<Void> deleteTask(DeleteTaskDTO deleteTaskDTO){
 		
 		this.logger.log(Level.INFO, "deleting a task");
-		
-		if(deleteTaskDTO.id() == null || deleteTaskDTO.id().toString().isEmpty()) {
-			this.logger.log(Level.WARNING, "the provided task ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
-		
-		if(deleteTaskDTO.creatorId() == null || deleteTaskDTO.creatorId().toString().isEmpty()) {
-			this.logger.log(Level.WARNING, "the provided creator ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
 		
 		try {
 			this.logger.log(Level.WARNING, "fetching task from the database");
