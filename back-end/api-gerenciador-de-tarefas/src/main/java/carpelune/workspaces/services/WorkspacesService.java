@@ -66,11 +66,6 @@ public class WorkspacesService {
 		
 		this.logger.log(Level.INFO, "fetching workspace by ID");
 		
-		if(workspaceId == null || workspaceId.toString().isEmpty()) {
-			this.logger.log(Level.WARNING, "the provided ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
-		
 		try {
 			this.logger.log(Level.WARNING, "fetching workspace from the database");
 			Workspace searchedWorkspace = this.workspacesRepository.findById(workspaceId).get();
@@ -91,16 +86,6 @@ public class WorkspacesService {
 	public ResponseEntity<Void> updateWorkspace(UpdateWorkspaceDTO updateWorkspaceDTO){
 		
 		this.logger.log(Level.INFO, "updating workspace");
-		
-		if(updateWorkspaceDTO.id() == null || updateWorkspaceDTO.id().toString().isEmpty()) {
-			this.logger.log(Level.WARNING, "the provided workspace ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
-		
-		if(updateWorkspaceDTO.userId() == null || updateWorkspaceDTO.userId().toString().isEmpty()) {
-			this.logger.log(Level.WARNING, "the provided user ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
 		
 		try {
 			this.logger.log(Level.WARNING, "checking in the database if the user is an administrator of the workspace");
@@ -148,16 +133,6 @@ public class WorkspacesService {
 	public ResponseEntity<Void> deleteWorkspace(DeleteWorkspaceDTO deleteWorkspaceDTO){
 		
 		this.logger.log(Level.INFO, "deleting workspace");
-		
-		if(deleteWorkspaceDTO.userId() == null || deleteWorkspaceDTO.toString().isEmpty()) {
-			this.logger.log(Level.INFO, "the provided user ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
-		
-		if(deleteWorkspaceDTO.workspaceId() == null || deleteWorkspaceDTO.toString().isEmpty()) {
-			this.logger.log(Level.INFO, "the provided workspace ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
 		
 		try {
 			this.logger.log(Level.WARNING, "checking in the database if the user is an administrator of the workspace");
