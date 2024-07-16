@@ -34,10 +34,6 @@ public class ProjectsService {
 	public ResponseEntity<Project> createProject(CreateProjectDTO createProjectDTO){
 		
 		this.logger.log(Level.INFO, "creating a new project");
-		if(createProjectDTO.workspaceId() != null || createProjectDTO.workspaceId().toString().isEmpty()) {
-			this.logger.log(Level.WARNING, "the provided workspace ID is undefined");
-			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
-		}
 		
 		try {
 			Project newProject = new Project();
@@ -61,11 +57,6 @@ public class ProjectsService {
 		
 		this.logger.log(Level.INFO, "fetching project by ID");
 		
-		if(projectId == null || projectId.toString().isEmpty()) {
-			this.logger.log(Level.WARNING, "the provided project ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
-		
 		try {
 			this.logger.log(Level.WARNING, "fetching project from the database");
 			Project searchedProject = this.projectsRepository.findById(projectId).get();
@@ -86,16 +77,6 @@ public class ProjectsService {
 	public ResponseEntity<Void> updateProject(UpdateProjectDTO updateProjectDTO){
 		
 		this.logger.log(Level.INFO, "updating project");
-		
-		if(updateProjectDTO.id() == null || updateProjectDTO.id().toString().isEmpty()) {
-			this.logger.log(Level.WARNING, "the provided project ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
-		
-		if(updateProjectDTO.userId() == null || updateProjectDTO.userId().toString().isEmpty()) {
-			this.logger.log(Level.WARNING, "the provided user ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
 		
 		try {
 			this.logger.log(Level.WARNING, "checking in the database if the user is an administrator of the workspace");
@@ -142,16 +123,6 @@ public class ProjectsService {
 	public ResponseEntity<Void> deleteProject(DeleteProjectDTO deleteProjectDTO){
 		
 		this.logger.log(Level.INFO, "deleting project by ID");
-		
-		if(deleteProjectDTO.userId() == null || deleteProjectDTO.userId().toString().isEmpty()) {
-			this.logger.log(Level.WARNING, "the provided user ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
-		
-		if(deleteProjectDTO.projectId() == null || deleteProjectDTO.projectId().toString().isEmpty()) {
-			this.logger.log(Level.WARNING, "the provided project ID is undefined");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
 		
 		try {
 			this.logger.log(Level.WARNING, "fetching the project from database");
