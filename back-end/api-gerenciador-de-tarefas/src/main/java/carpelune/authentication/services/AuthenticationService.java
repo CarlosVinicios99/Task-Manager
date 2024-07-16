@@ -12,7 +12,6 @@ import carpelune.authentication.models.Login;
 import carpelune.config.security.TokenService;
 
 @Service
-@SuppressWarnings("rawtypes")
 public class AuthenticationService {
 	
 	@Autowired
@@ -22,7 +21,7 @@ public class AuthenticationService {
 	private TokenService tokenService;
 	
 
-	public ResponseEntity login(AuthenticationDTO data) {
+	public ResponseEntity<LoginResponseDTO> login(AuthenticationDTO data) {
 		try {
 			var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
 			var auth = this.authenticationManager.authenticate(usernamePassword);
