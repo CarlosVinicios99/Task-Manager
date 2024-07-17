@@ -94,6 +94,10 @@ public class UsersService {
 		}
 	}
 	
+	public ResponseEntity<Void> findUsersByWorkspace(){
+		return ResponseEntity.status(HttpStatus.OK).build();
+	}
+	
 	public ResponseEntity<Void> updateUser(UpdateUserDTO updateUserDTO){
 		
 		this.logger.log(Level.INFO, "updating user");
