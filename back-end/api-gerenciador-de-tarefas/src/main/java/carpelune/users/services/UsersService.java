@@ -6,6 +6,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,7 +19,9 @@ import carpelune.users.dto.CreateUserDTO;
 import carpelune.users.dto.FindUserDTO;
 import carpelune.users.dto.UpdateUserDTO;
 import carpelune.users.models.User;
+import carpelune.users.models.UserWorkspaceView;
 import carpelune.users.repositories.UsersRepository;
+import carpelune.users.repositories.UsersWorkspacesViewRepository;
 import carpelune.utils.TextEncryptor;
 
 @Service
@@ -29,6 +34,9 @@ public class UsersService {
 	
 	@Autowired
 	private LoginRepository loginRepository;
+	
+	@Autowired
+	private UsersWorkspacesViewRepository usersWorkspacesViewRepository;
 	
 	
 	public ResponseEntity<FindUserDTO> createUser(CreateUserDTO createUserDTO){
@@ -94,8 +102,19 @@ public class UsersService {
 		}
 	}
 	
-	public ResponseEntity<Void> findUsersByWorkspace(){
-		return ResponseEntity.status(HttpStatus.OK).build();
+	public ResponseEntity<Page<UserWorkspaceView>> findUsersByWorkspace(UUID workspaceId, int page, int limit){
+		
+		this.logger.log(Level.INFO, "fetching users by workspace");
+		
+		try {
+			Pageable pageable = PageRequest.of(page, limit);
+			Page<UserWorkspaceView> usersWorkspaces = this.usersWorkspacesViewRepository.findByWorkspaceId(workspaceId, pageable);
+			return ResponseEntity.status(HttpStatus.OK).body(usersWorkspaces);
+		}
+		catch(Exception error) {
+			this.logger.log(Level.SEVERE, "error while fetching users by workspace " + error.getMessage());
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+		}
 	}
 	
 	public ResponseEntity<Void> updateUser(UpdateUserDTO updateUserDTO){
