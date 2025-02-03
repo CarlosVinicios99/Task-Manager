@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import carpelune.authentication.models.Login;
 import carpelune.authentication.repositories.LoginRepository;
+import carpelune.exceptions.PasswordMismatchException;
 import carpelune.users.dto.CreateUserDTO;
 import carpelune.users.dto.FindUserDTO;
 import carpelune.users.dto.UpdateUserDTO;
@@ -44,39 +45,33 @@ public class UsersService {
 		this.logger.log(Level.INFO, "creating a new user");
 		
 		this.logger.log(Level.INFO, "checking if the password and confirmation password are the same");
-		
+
 		if(createUserDTO.password() != createUserDTO.confirmPassword()) {
 			this.logger.log(Level.WARNING, "the confirmation password is incorrect");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			throw new PasswordMismatchException();
 		}
 		
-		try {
-			Login newLogin = new Login();
-			newLogin.setEmail(createUserDTO.email());
-			
-			this.logger.log(Level.INFO, "encrypting the password");
-			String encryptedPassword = TextEncryptor.encode(createUserDTO.password());
-			newLogin.setPassword(encryptedPassword);
-			
-			this.logger.log(Level.WARNING, "saving login record in the database");
-			newLogin = this.loginRepository.save(newLogin);
-			
-			User newUser = new User();
-			newUser.setName(createUserDTO.name());
-			newUser.setLogin(newLogin);
-			
-			this.logger.log(Level.WARNING, "saving user record in the database");
-			User createdUser = this.usersRepository.save(newUser);
-			
-			return ResponseEntity.status(HttpStatus.CREATED)
-				.body(new FindUserDTO(createdUser.getId(), createdUser.getName(), createdUser.getLogin().getEmail()));
-			
-		}
-		catch(Exception error) {
-			this.logger.log(Level.SEVERE, "error while registering user " + error.getMessage());
-			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
-		}
 		
+		Login newLogin = new Login();
+		newLogin.setEmail(createUserDTO.email());
+			
+		this.logger.log(Level.INFO, "encrypting the password");
+		String encryptedPassword = TextEncryptor.encode(createUserDTO.password());
+		newLogin.setPassword(encryptedPassword);
+			
+		this.logger.log(Level.WARNING, "saving login record in the database");
+		newLogin = this.loginRepository.save(newLogin);
+			
+		User newUser = new User();
+		newUser.setName(createUserDTO.name());
+		newUser.setLogin(newLogin);
+			
+		this.logger.log(Level.WARNING, "saving user record in the database");
+		User createdUser = this.usersRepository.save(newUser);
+			
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(new FindUserDTO(createdUser.getId(), createdUser.getName(), createdUser.getLogin().getEmail()));
+			
 	}
 	
 	public ResponseEntity<FindUserDTO> findUserById(UUID userId){
