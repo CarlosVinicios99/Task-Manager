@@ -46,8 +46,8 @@ public class UsersService {
 		this.logger.log(Level.INFO, "creating a new user");
 		
 		this.logger.log(Level.INFO, "checking if the password and confirmation password are the same");
-
-		if(createUserDTO.password() != createUserDTO.confirmPassword()) {
+	
+		if(!createUserDTO.password().equals(createUserDTO.confirmPassword())) {
 			this.logger.log(Level.WARNING, "the confirmation password is incorrect");
 			throw new PasswordMismatchException();
 		}
