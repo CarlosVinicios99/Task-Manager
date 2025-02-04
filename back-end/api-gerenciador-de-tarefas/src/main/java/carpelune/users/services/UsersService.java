@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import carpelune.authentication.models.Login;
 import carpelune.authentication.repositories.LoginRepository;
+import carpelune.exceptions.EmailConflictException;
 import carpelune.exceptions.PasswordMismatchException;
 import carpelune.users.dto.CreateUserDTO;
 import carpelune.users.dto.FindUserDTO;
@@ -51,6 +52,12 @@ public class UsersService {
 			throw new PasswordMismatchException();
 		}
 		
+		this.logger.log(Level.INFO, "checking if email already exists");
+		Login emailExists = this.loginRepository.findByEmail(createUserDTO.email());
+		
+		if(emailExists != null) {
+			throw new EmailConflictException();
+		}
 		
 		Login newLogin = new Login();
 		newLogin.setEmail(createUserDTO.email());
