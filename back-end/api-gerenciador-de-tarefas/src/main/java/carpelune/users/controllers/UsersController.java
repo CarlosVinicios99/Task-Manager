@@ -42,7 +42,7 @@ public class UsersController {
 		return this.usersService.findUserById(userId);
 	}
 	
-	@GetMapping("/{workspaceId}")
+	@GetMapping("/workspace/{workspaceId}")
 	public ResponseEntity<Page<UserWorkspaceView>> findUsersByWorkspace(
 		@PathVariable UUID workspaceId,
 		@RequestParam(value = "page", defaultValue = "0") int page, 

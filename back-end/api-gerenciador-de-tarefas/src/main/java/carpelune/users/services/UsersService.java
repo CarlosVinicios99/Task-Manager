@@ -17,6 +17,7 @@ import carpelune.authentication.models.Login;
 import carpelune.authentication.repositories.LoginRepository;
 import carpelune.exceptions.EmailConflictException;
 import carpelune.exceptions.PasswordMismatchException;
+import carpelune.exceptions.UserNotFoundException;
 import carpelune.users.dto.CreateUserDTO;
 import carpelune.users.dto.FindUserDTO;
 import carpelune.users.dto.UpdateUserDTO;
@@ -56,6 +57,7 @@ public class UsersService {
 		Login emailExists = this.loginRepository.findByEmail(createUserDTO.email());
 		
 		if(emailExists != null) {
+			this.logger.log(Level.WARNING, "email already exists");
 			throw new EmailConflictException();
 		}
 		
@@ -82,41 +84,26 @@ public class UsersService {
 	}
 	
 	public ResponseEntity<FindUserDTO> findUserById(UUID userId){
-		
 		this.logger.log(Level.INFO, "fetching user by ID: " + userId);
 		
-		try {
-			this.logger.log(Level.WARNING, "fetching user from the database");
-			User searchedUser = this.usersRepository.findById(userId).get();
+		this.logger.log(Level.WARNING, "fetching user from the database");
+		User searchedUser = this.usersRepository.findById(userId).get();
 			
-			if(searchedUser == null) {
-				this.logger.log(Level.WARNING, "the provided ID does not correspond to any existing user");
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-			}
-			
-			return ResponseEntity.status(HttpStatus.OK)
-				.body(new FindUserDTO(searchedUser.getId(), searchedUser.getName(), searchedUser.getLogin().getEmail()));
-			
+		if(searchedUser == null) {
+			this.logger.log(Level.WARNING, "the provided ID does not correspond to any existing user");
+			throw new UserNotFoundException();
 		}
-		catch(Exception error) {
-			this.logger.log(Level.SEVERE, "error while fetching user by ID " + error.getMessage());
-			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
-		}
+			
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(new FindUserDTO(searchedUser.getId(), searchedUser.getName(), searchedUser.getLogin().getEmail()));
 	}
 	
 	public ResponseEntity<Page<UserWorkspaceView>> findUsersByWorkspace(UUID workspaceId, int page, int limit){
-		
 		this.logger.log(Level.INFO, "fetching users by workspace");
-		
-		try {
-			Pageable pageable = PageRequest.of(page, limit);
-			Page<UserWorkspaceView> usersWorkspaces = this.usersWorkspacesViewRepository.findByWorkspaceId(workspaceId, pageable);
-			return ResponseEntity.status(HttpStatus.OK).body(usersWorkspaces);
-		}
-		catch(Exception error) {
-			this.logger.log(Level.SEVERE, "error while fetching users by workspace " + error.getMessage());
-			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
-		}
+	
+		Pageable pageable = PageRequest.of(page, limit);
+		Page<UserWorkspaceView> usersWorkspaces = this.usersWorkspacesViewRepository.findByWorkspaceId(workspaceId, pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(usersWorkspaces);
 	}
 	
 	public ResponseEntity<Void> updateUser(UpdateUserDTO updateUserDTO){
