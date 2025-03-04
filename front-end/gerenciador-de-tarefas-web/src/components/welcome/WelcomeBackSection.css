@@ -1,0 +1,52 @@
+.welcome-back-content {
+    background-color: #357ABD;
+    color: white;
+    width: 100%;
+    padding: 2%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2%;
+
+    border-top-left-radius: 1.2rem;
+    border-bottom-left-radius: 1.2rem;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: bolder;
+}
+
+.text-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-bottom: 0.3rem;
+}
+
+.text-content p {
+    font-size: 1.15rem;
+    font-weight: 300;
+}
+
+.signin-button {
+    background-color: transparent;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 1.5rem;
+    border: 1px solid white;
+    height: 5.5%;
+    width: 11%;
+    cursor: pointer;
+}
+
+.signin-button:hover {
+   background-color: #2865a2dc;
+   transition: 0.5s;
+   border: 1px solid #b5f8ffdc;
+}
