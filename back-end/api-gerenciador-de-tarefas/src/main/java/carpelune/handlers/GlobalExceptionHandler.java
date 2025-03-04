@@ -1,7 +1,10 @@
 package carpelune.handlers;
 
+import javax.naming.AuthenticationException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -29,6 +32,18 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException err){
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
 			.body(new ErrorResponse(err.getMessage(), HttpStatus.NOT_FOUND.value()));
+	}
+	
+	@ExceptionHandler(BadCredentialsException.class)
+	public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+			.body(new ErrorResponse("E-mail or password incorrect", HttpStatus.UNAUTHORIZED.value()));
+	}
+
+	@ExceptionHandler(AuthenticationException.class)
+	public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+			.body(new ErrorResponse("Authentication Failed!", HttpStatus.UNAUTHORIZED.value()));
 	}
 	
 	@ExceptionHandler(Exception.class)
