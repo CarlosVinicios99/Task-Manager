@@ -31,17 +31,11 @@ public class AuthenticationService {
 	
 
 	public ResponseEntity<LoginResponseDTO> login(AuthenticationDTO data) {
-		try {
-			var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
-			var auth = this.authenticationManager.authenticate(usernamePassword);
-			var token = tokenService.generateToken((Login) auth.getPrincipal());
-			Login login = this.loginRepository.findByEmail(data.email());
-			User user = this.userRepository.findByLoginId(login.getId());
-			return ResponseEntity.ok(new LoginResponseDTO(token, user.getId()));
-		}
-		catch(Exception error) {
-			System.out.println(error.getMessage());
-			return ResponseEntity.badRequest().build();
-		}
+		var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
+		var auth = this.authenticationManager.authenticate(usernamePassword);
+		var token = tokenService.generateToken((Login) auth.getPrincipal());
+		Login login = this.loginRepository.findByEmail(data.email());
+		User user = this.userRepository.findByLoginId(login.getId());
+		return ResponseEntity.ok(new LoginResponseDTO(token, user.getId()));		
 	}	
 }
