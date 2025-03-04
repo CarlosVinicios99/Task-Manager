@@ -1,10 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import './App.css'
 import Welcome from './pages/welcome/Welcome'
 
 function App() {
- 
-
   return (
     <BrowserRouter>
       <Routes>
