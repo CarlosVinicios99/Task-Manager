@@ -106,62 +106,54 @@ public class UsersService {
 		return ResponseEntity.status(HttpStatus.OK).body(usersWorkspaces);
 	}
 	
-	public ResponseEntity<Void> updateUser(UpdateUserDTO updateUserDTO){
-		
+	public ResponseEntity<Void> updateUser(UpdateUserDTO updateUserDTO){		
 		this.logger.log(Level.INFO, "updating user");
 		
-		try {
-			this.logger.log(Level.WARNING, "fetching user from the database");
-			User updatedUser = this.usersRepository.findById(updateUserDTO.id()).get();
+		this.logger.log(Level.WARNING, "fetching user from the database");
+		User updatedUser = this.usersRepository.findById(updateUserDTO.id()).get();
 			
-			if(updatedUser == null) {
-				this.logger.log(Level.WARNING, "the provided ID does not correspond to any existing user");
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		if(updatedUser == null) {
+			this.logger.log(Level.WARNING, "the provided ID does not correspond to any existing user");
+			throw new UserNotFoundException();
+		}
+			
+		Field[] fields = UpdateUserDTO.class.getDeclaredFields();
+			
+		for(Field field : fields) {
+			field.setAccessible(true);
+			try {
+		        Object value = field.get(updateUserDTO);
+	
+		        if (value != null) {
+		        	try {
+		        		Field userField = User.class.getDeclaredField(field.getName());
+		                userField.setAccessible(true);
+		                userField.set(updatedUser, value);
+		            } 
+		            catch(NoSuchFieldException e) {
+		                this.logger.log(Level.WARNING, "Field " + field.getName() + "field not found in user");
+		            }
+		        }
 			}
+			catch(IllegalAccessException e) {
+				this.logger.log(Level.SEVERE, "Could not access field " + field.getName(), e.getMessage());
+			}
+	    }
 			
-			Field[] fields = UpdateUserDTO.class.getDeclaredFields();
+		this.logger.log(Level.WARNING, "updating user in the database");
+		this.usersRepository.save(updatedUser);
 			
-			for(Field field : fields) {
-	            field.setAccessible(true);
-	            Object value = field.get(updateUserDTO);
-
-	            if (value != null) {
-	                try {
-	                    Field userField = User.class.getDeclaredField(field.getName());
-	                    userField.setAccessible(true);
-	                    userField.set(updatedUser, value);
-	                } 
-	                catch(NoSuchFieldException e) {
-	                    logger.log(Level.WARNING, "Field " + field.getName() + "field not found in user");
-	                }
-	            }
-	        }
-			
-			this.logger.log(Level.WARNING, "updating user in the database");
-			this.usersRepository.save(updatedUser);
-			
-			return ResponseEntity.status(HttpStatus.OK).build();
-			
-		}
-		catch(Exception error) {
-			this.logger.log(Level.SEVERE, "error while updating user " + error.getMessage());
-			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
-		}
+		return ResponseEntity.status(HttpStatus.OK).build();	
 	}
 	
+	
 	public ResponseEntity<Void> deleteUserById(UUID userId) { 
-		
 		this.logger.log(Level.INFO, "Deleting user with ID: " + userId);
 		
-		try {
-			this.logger.log(Level.WARNING, "deleting user from the database");
-			this.usersRepository.deleteById(userId);
+	
+		this.logger.log(Level.WARNING, "deleting user from the database");
+		this.usersRepository.deleteById(userId);
 			
-			return ResponseEntity.status(HttpStatus.OK).build();
-		}
-		catch(Exception error) {
-			this.logger.log(Level.SEVERE, "error while deleting user by ID " + error.getMessage());
-			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
-		}
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 }
