@@ -1,0 +1,18 @@
+.input-content {
+    display: flex;
+    flex-direction: row;
+    background-color: #f4f7fd;
+    padding: 1rem;
+    gap: 1rem;
+}
+
+.input-content img {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.input-content input {
+    border-style: none;
+    outline: none;
+    background-color: transparent;
+}

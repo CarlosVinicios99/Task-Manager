@@ -5,10 +5,11 @@ const Signup = () => {
     <div className="signup-content">
         <h1>Create Your Account</h1>
         <form>
-            <InputForms key={1} src="" placeholder="Name" type="text"/>
-            <InputForms key={2} src="" placeholder="E-mail" type="text"/>
-            <InputForms key={3} src="" placeholder="Password" type="password"/>
+            <InputForms key={1} src={import.meta.env.VITE_ICON_NAME} placeholder="Name" type="text"/>
+            <InputForms key={2} src={import.meta.env.VITE_ICON_EMAIL} placeholder="E-mail" type="text"/>
+            <InputForms key={3} src={import.meta.env.VITE_ICON_PASSWORD} placeholder="Password" type="password"/>
         </form>
+        <button>Signup</button>
     </div>
   )
 }

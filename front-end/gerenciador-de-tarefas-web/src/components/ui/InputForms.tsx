@@ -1,5 +1,7 @@
 import { InputFormsProps } from '../../interfaces/InputFormsProps'
 
+import "./InputForms.css"
+
 const InputForms = ({src, type, placeholder}: InputFormsProps) => {
   return (
     <div className="input-content">
