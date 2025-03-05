@@ -1,7 +1,9 @@
+@import '../../index.css';
+
 .welcome-back-content {
-    background-color: #357ABD;
+    background-color: var(--primary-color);
     color: white;
-    width: 100%;
+    width: 40%;
     padding: 2%;
 
     display: flex;
@@ -41,7 +43,7 @@ h1 {
     border-radius: 1.5rem;
     border: 1px solid white;
     height: 5.5%;
-    width: 11%;
+    width: 30%;
     cursor: pointer;
 }
 
