@@ -1,7 +1,9 @@
+@import '../../index.css';
+
 .input-content {
     display: flex;
     flex-direction: row;
-    background-color: #ebeef5;
+    background-color: var(--secundary-color);
     padding: 1.1rem;
     gap: 1rem;
 }
