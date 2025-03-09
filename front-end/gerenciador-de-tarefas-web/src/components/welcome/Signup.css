@@ -29,7 +29,14 @@
     color: white;
     font-weight: 600;
     font-size: 1rem;
-    border: none;
+    border: 1px solid white;
     height: 5.5%;
     width: 20%;
+    cursor: pointer;
+}
+
+.button-signup:hover {
+    background-color: #2865a2dc;
+    transition: 0.5s;
+    border: 1px solid #b5f8ffdc;
 }
