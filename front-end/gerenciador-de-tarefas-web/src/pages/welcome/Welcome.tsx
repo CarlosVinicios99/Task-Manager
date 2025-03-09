@@ -6,13 +6,12 @@ import Login from '../../components/welcome/Login';
 
 const Welcome = () => {
 
-  const [loginSelected, setLoginSelected] = useState<boolean>(false)
+  const [isLoginSelected, setIsLoginSelected] = useState<boolean>(false)
 
   return (
     <div className="welcome-content">
-      <WelcomeBackSection/>
-      {loginSelected ? (<Login/>) : (<Signup/>)}
-      
+      <WelcomeBackSection selectLogin={setIsLoginSelected}/>
+      {isLoginSelected ? (<Login/>) : (<Signup/>)}
     </div>
   )
 
