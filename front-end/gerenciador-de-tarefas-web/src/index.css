@@ -12,4 +12,7 @@
 :root {
   --primary-color: rgb(57, 140, 222);
   --secundary-color: #ebeef5;
+  --color-inputs: rgb(111, 111, 111);
+  --background-button-hover: #2865a2dc;
+  --border-hover: #b5f8ffdc;
 }

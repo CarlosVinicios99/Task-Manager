@@ -20,4 +20,5 @@
     font-size: large;
     width: 100%;
     font-weight: 400;
+    color: var(--color-inputs);
 }
