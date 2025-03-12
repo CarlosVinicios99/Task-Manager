@@ -1,5 +1,5 @@
 import { User } from "../../interfaces/User";
-import { CreateUserDto } from "./interfaces/CreateUserDto";
+import { CreateUserDto } from "./dto/CreateUserDto";
 
 export class UserService {
 
