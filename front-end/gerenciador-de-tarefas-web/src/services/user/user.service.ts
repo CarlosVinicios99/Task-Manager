@@ -18,7 +18,7 @@ export class UserService {
     async createUser(data: CreateUserDto): Promise<User | ApiError>{
         try{
             const url: string = `${import.meta.env.TASK_MANAGER_API_URL}user`
-            const response = await fetch(url, {
+            const response: Response = await fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -34,9 +34,9 @@ export class UserService {
             const user: User = await response.json()    
             return user
         }
-        catch(error: any){
+        catch(error: unknown){
             return {
-                status: 500,
+                status: 500
             }
         }
     }
