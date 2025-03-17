@@ -1,4 +1,5 @@
 import { User } from "../../interfaces/User";
+import { ApiError } from "../errors/ApiError";
 import { CreateUserDto } from "./dto/CreateUserDto";
 
 export class UserService {
@@ -14,7 +15,7 @@ export class UserService {
         return UserService.instance
     }
 
-    async createUser(data: CreateUserDto){
+    async createUser(data: CreateUserDto): Promise<User | ApiError>{
         try{
             const url: string = `${import.meta.env.TASK_MANAGER_API_URL}user`
             const response = await fetch(url, {
@@ -25,12 +26,18 @@ export class UserService {
                 body: JSON.stringify(data),
             })
 
-            const user: User = await response.json()
+            if(response.status !== 201){
+                const responseError: ApiError = await response.json()
+                return responseError
+            }
 
+            const user: User = await response.json()    
             return user
         }
-        catch(error){
-            return null
+        catch(error: any){
+            return {
+                status: 500,
+            }
         }
     }
 
