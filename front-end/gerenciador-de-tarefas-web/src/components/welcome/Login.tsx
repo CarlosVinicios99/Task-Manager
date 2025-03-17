@@ -20,13 +20,13 @@ const Login = () => {
     <div className="login-content">
         <h1 className="title">Login</h1>
         <form className="form-login-content">
-            <InputForms key={4} 
+            <InputForms key={5} 
               src={import.meta.env.VITE_ICON_EMAIL} 
               placeholder="E-mail" 
               type="text"
               onChange={handleEmailChange}
             />
-            <InputForms key={5} 
+            <InputForms key={6} 
               src={import.meta.env.VITE_ICON_PASSWORD} 
               placeholder="Password" 
               type="password"
