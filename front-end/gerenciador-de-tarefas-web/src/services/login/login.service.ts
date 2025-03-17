@@ -24,7 +24,6 @@ export class LoginService {
                     "Content-Type": "application/json"
                 }
             })
-
             const loginResponse = await response.json()
             return loginResponse
         }
