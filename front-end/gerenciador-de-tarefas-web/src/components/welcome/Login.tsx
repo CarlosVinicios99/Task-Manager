@@ -2,9 +2,14 @@ import { useState } from "react"
 import InputForms from "../ui/InputForms"
 
 import "./Login.css"
+import { LoginService } from "../../services/login/login.service"
+import { ApiError } from "../../services/errors/ApiError"
+import { Login as LoginData } from "../../interfaces/Login"
+import { useNavigate } from "react-router-dom"
 
 const Login = () => {
   
+  const navigate = useNavigate()
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
 
@@ -14,6 +19,18 @@ const Login = () => {
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value)
+  }
+
+  const handleSignin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+
+    const loginService: LoginService = LoginService.getInstance()
+
+    const data: LoginData | ApiError = await loginService.login({email, password})
+
+    if('token' in data){
+      navigate('/workspaces')
+    }
   }
 
   return (
@@ -33,7 +50,12 @@ const Login = () => {
               onChange={handlePasswordChange}
             />
         </form>
-        <button className="button-login">LOGIN</button>
+        <button 
+          className="button-login"
+          onClick={handleSignin}
+        >
+          LOGIN
+        </button>
     </div>
   )
 
