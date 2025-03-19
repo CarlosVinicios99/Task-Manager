@@ -2,8 +2,15 @@ import { useState } from "react"
 import InputForms from "../ui/InputForms"
 
 import "./Signup.css"
+import { UserService } from "../../services/user/user.service"
+import { User } from "../../interfaces/User"
+import { ApiError } from "../../services/errors/ApiError"
+import { useNavigate } from "react-router-dom"
+import { LoginService } from "../../services/login/login.service"
 
 const Signup = () => {
+
+  const navigate = useNavigate();
 
   const [name, setName] = useState<string>("")
   const [email, setEmail] = useState<string>("")
@@ -25,6 +32,33 @@ const Signup = () => {
 
   const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConfirmPassword(e.target.value)
+  }
+
+  const handleSignup = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+
+    const userService: UserService = UserService.getInstance()
+
+    const data: User | ApiError = await userService.createUser({name, email, password, confirmPassword})
+
+    if('id' in data){
+      const user: User = data
+      const loginService: LoginService = LoginService.getInstance()
+      await loginService.login({email: user.email, password})
+      navigate('/workspaces')
+    }
+
+    if('status' in data){
+      const apiError: ApiError = data
+      switch(apiError.status){
+        case 400:
+          break
+        case 409:
+          break
+        case 500:
+          break
+      }
+    }
   }
 
   return (
@@ -59,7 +93,12 @@ const Signup = () => {
               onChange={handleConfirmPasswordChange}
             />
         </form>
-        <button className="button-signup">SIGN UP</button>
+        <button 
+          className="button-signup"
+          onClick={handleSignup}
+        >
+          SIGN UP
+        </button>
     </div>
   )
 }

@@ -33,6 +33,9 @@ export class LoginService {
             }
 
             const login: Login = await response.json()
+
+            localStorage.setItem(login.userId, login.token)
+            
             return login
         }
         catch(error: unknown){
